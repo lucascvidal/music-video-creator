@@ -4,57 +4,6 @@ require 'uri'
 require 'net/http'
 require 'json'
 
-@options = {}
-
-OptionParser.new do |opts|
-  opts.on("-v", "--verbose", "Show extra information") do
-    @options[:verbose] = true
-  end
-end.parse!
-
-KEYS = [
-  "f_major",
-  "b_flat_major",
-  "c_sharp_major",
-  "g_major",
-  "b_major",
-  "f_sharp_major",
-  "a_flat_major",
-  "c_major",
-  "a_major",
-  "e_flat_major",
-  "d_major",
-  "e_major"
-]
-
-render_track_url = URI(ENV['SOUNDFUL_RENDER_TRACK_URL'])
-
-puts("Do not forget to update variables in .env before running this script.")
-
-KEYS.sample(10).each_with_index do |key, index|
-  preview_track_response = preview_track(key)
-  puts("Waiting a few seconds to create track.") if @options[:verbose]
-  sleep(rand(2..7))
-
-  create_track_response = create_track(preview_track_response["id"],
-    preview_track_response["bpm"],
-    preview_track_response["key"],
-    preview_track_response["template"]["id"],
-    preview_track_response["duration"],
-    preview_track_response["template"]["isPremium"],
-    preview_track_response["template"]["name"],
-    index)
-  
-  puts("Waiting a few seconds to render track.") if @options[:verbose]
-  sleep(rand(2..7))
-
-  render_track(create_track_response["id"])
-  puts("Waiting a few seconds to move on to the next key.") if @options[:verbose]
-  sleep(rand(2..7))
-end
-
-puts("Script ran. 10 new tracks should be available at My Library in Soundful if everything went ok.")
-
 def preview_track(key)
   puts("Previewing track with key: #{key}, and bpm: #{ENV['BPM']}") if @options[:verbose]
   preview_track_url = URI(ENV['SOUNDFUL_PREVIEW_TRACK_URL'])
@@ -62,6 +11,7 @@ def preview_track(key)
   https.use_ssl = true
   request = Net::HTTP::Post.new(preview_track_url)
   request["authorizationToken"] = ENV['AUTH_TOKEN']
+  request["Content-Type"] = "application/json"
   request.body = JSON.generate({ :templateId => ENV['TEMPLATE_ID'], :bpm => ENV['BPM'], :key => key })
   response = https.request(request)
   puts("Response status: #{response.code}") if @options[:verbose]
@@ -108,8 +58,55 @@ def render_track(track_id)
   request.body = JSON.generate({ type: "STANDARD" })
   response = https.request(request)
   puts("Response status: #{response.code}") if @options[:verbose]
-  return JSON.parse(response.read_body)
 rescue => e
   puts(e)
 end
   
+@options = {}
+
+OptionParser.new do |opts|
+  opts.on("-v", "--verbose", "Show extra information") do
+    @options[:verbose] = true
+  end
+end.parse!
+
+KEYS = [
+  "f_major",
+  "b_flat_major",
+  "c_sharp_major",
+  "g_major",
+  "b_major",
+  "f_sharp_major",
+  "a_flat_major",
+  "c_major",
+  "a_major",
+  "e_flat_major",
+  "d_major",
+  "e_major"
+]
+
+puts("Do not forget to update variables in .env before running this script.")
+
+KEYS.sample(10).each_with_index do |key, index|
+  preview_track_response = preview_track(key)
+  puts("Waiting a few seconds to create track.") if @options[:verbose]
+  sleep(rand(2..7))
+
+  create_track_response = create_track(preview_track_response["id"],
+    preview_track_response["bpm"],
+    preview_track_response["key"],
+    preview_track_response["template"]["id"],
+    preview_track_response["duration"],
+    preview_track_response["template"]["isPremium"],
+    preview_track_response["template"]["name"],
+    index)
+  
+  puts("Waiting a few seconds to render track.") if @options[:verbose]
+  sleep(rand(2..7))
+
+  render_track(create_track_response["id"])
+  puts("Waiting a few seconds to move on to the next key.") if @options[:verbose]
+  sleep(rand(2..7))
+end
+
+puts("Script ran. 10 new tracks should be available at My Library in Soundful if everything went ok.")
