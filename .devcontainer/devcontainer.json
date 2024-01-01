@@ -1,18 +1,20 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/ruby
 {
-	"name": "Ruby",
+    "name": "Ruby and Python",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/ruby:1-3.2-bullseye"
+	"image": "mcr.microsoft.com/devcontainers/ruby:1-3.2-bullseye",
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
-	// "features": {},
-
+	"features": {
+		"ghcr.io/devcontainers/features/python:1": {}
+	},
+	
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "ruby --version",
+    "postCreateCommand": "sudo apt update && sudo apt install -y ffmpeg imagemagick libmagickwand-dev libmagickcore-dev"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
