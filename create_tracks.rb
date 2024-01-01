@@ -120,7 +120,8 @@ KEYS.sample(10).each_with_index do |key, index|
 
   track_info = {
     'track_id' => create_track_response[:response]["id"],
-    'track_name' => create_track_response[:track_name]
+    'track_name' => create_track_response[:track_name],
+    'template_name' => preview_track_response["template"]["name"]
   }
   
   all_tracks_info << track_info
