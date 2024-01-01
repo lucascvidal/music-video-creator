@@ -1,52 +1,82 @@
 # Soundful Bot
 
-I was getting tired of doing repetitive tasks with the Soundful website UI. They do not have an open API, but they do run a Single Page App, which means everything, if well designed and developed, should be exposed through specific endpoints.
+This project started as just a script to automate track creation in Soundful. It then evolved to automating track concatenation and video creation. Now it generates title, description and tags for uploading it to YouTube. It ended up also uploading the video to YouTube.
 
-I took advantage of that and created a script to automate track previewing, creation and rendering. This should make my life easier as I create soundtracks for my dark YouTube channel project.
+## Prerequisites
+
+You need Ruby and Python. I'm using Ruby 3.2.2 and Python 3.9.2 as I'm developing this project. Furthermore, you need a few packages:
+```shell
+sudo apt update && sudo apt install -y ffmpeg imagemagick libmagickwand-dev libmagickcore-dev
+```
+
+So, install gems:
+```shell
+bundle install
+```
+
+Install python libs:
+```shell
+pip install -r requirements.txt
+```
+
+Create a tmp directory:
+```shell
+mkdir tmp/
+```
+
+Create audio, image and fonts directories:
+```shell
+cd tmp/
+mkdir audio/
+mkdir image/
+mkdir fonts/
+```
+
+Download Oswald Bold font and Lato Heavy font to fonts/ directory. You can find them at Google Fonts.
+
+Create a .env file with all the variables present at the .env.example file. You will need a Soundful subscription and OpenAI credits for this to work.
+
+For Soundful related variables, check the authorizationToken header using Dev Tools and get the User ID from the CDN URL when downloading a track from My Library. Soundful does not have a public API, so that's why we need to work around the restrictions.
+
+OpenAI is much simpler, just get an API Key from the OpenAI platform website.
+
+The last thing you need to set up is Google API credentials. Create a project on Google Cloud Platform, configure OAuth for desktop apps, set the scopes for youtube.upload and youtube.force-ssl, download the credentials.json file to the project's root directory and you should be good to go.
 
 ## Usage
 
-For things to work, there are 2 things I couldn't automate: authentication and getting template data. So for the script to run well, I've written it to use environment variables, and everytime you are willing to run the script, you will have to update the AUTH_TOKEN, BPM and TEMPLATE_ID variables in the .env file. You can get this information toying around with the Dev Tools in Soundful website. Every request to the preview endpoint after the login page has the authorizationToken header with the token needed for the script.
-
-Then, just run the script with or without the -v flag (verbose option):
+1. Prepare the .env file with the template ID, BPM, and auth token for Soundful;
+1. Generate tracks:
 ```shell
 ruby create_tracks.rb -v
 ```
-
-Few minutes after running the create_tracks script you can check if the tracks are available for download. If they are, running the script:
+1. Download tracks:
 ```shell
 ruby download_tracks.rb
 ```
-
-Will download the tracks that were just created and rendered to the tmp/audio directory. The track metadata for the script to work is located inside the tmp/track_info.json file. This file is created at the moment the create_tracks.rb script is run.
-
-## What I Learned
-
-This was my first CLI application using Ruby. I have developed CLI apps with C, C# and Python before, but with Ruby this was the first time.
-
-# Video creation script
-
-Thriving for efficiency made me create a shell script to concatenate 10 audio tracks created with the Ruby script and merge them with an image to create a video for the YouTube dark channel project. I was doing this manually, and it turns out it is much better to do so programatically.
-
-So, if you download the 10 tracks created with the Ruby script from Soundful to the tmp/audio directory and put a 1920px x 1080px image named input.png inside tmp/image directory, running the script:
+1. Generate a 1920 px x 1080 px image for the thumbnail, place it inside the tmp/image dir named as input.png (I'm using SeaArt as the source for that, but I haven't found a way to automate this task yet);
+1. Create video:
 ```shell
 ./create_video.sh
 ```
+1. Generate thumbnail by setting the THUMBNAIL_FIRST_LINE and THUMBNAIL_SECOND_LINE environment vars inside .env and running:
+```shell
+ruby create_thumbnail.rb
+```
+1. Upload the video to YouTube:
+```shell
+python upload_video.py
+```
 
-Should create a merged audio track named audio_output.mp3 and a video named video_output.mp4 inside the tmp directory. The video_output.mp4 is composed by the static image in a loop with the audio_output.mp3 soundtrack.
+# What I learned
 
-I have updated the script to remove the input files (audio and image) after the video is created.
+- Working with ImageMagick;
+- Working with the Desktop App OAuth flow;
+- Using the YouTube Data API V3;
+- Breaking the Soundful SPA API;
+- Using FFMPEG for the first time;
+- Integrating with Chat-GPT API.
 
-## What I Learned
+# Things worth investigating
 
-I had never written shell script, so it was definitely interesting to dig a little deeper and see what is possible to do with it. With the right CLI tools I think it was even possible to discard the Ruby scripts and write this bot only using shell script and things like cURL or WGet. My lack of knowledge made me write the most complex stuff (to me at least) in Ruby, but I have a feeling it is possible to convert that to Shell Script without loss of efficiency (maybe readability will suffer).
-
-# Wishlist
-
-Writing it here so I won't forget:
-- Authentication for Soundful:
-  - I have tried and tried to work this out with Selenium and proxy servers to no good. There is a reCaptcha at the login page that complicates every form of automation I have discovered so far.
-- Automating custom thumbnails generation using SeaArt and Canva:
-  - The SeaArt part needs more investigating, but the Canva automation part seems to be [possible with variables for the design](https://www.adcreative.ai/post/how-to-automate-canva-and-generate-hundreds-of-designs-using-creative-automation)
-- Upload to YouTube with title, description and tags generated by Chat-GPT:
-  - This is definitely possible to do, I just need to check if the Chat-GPT API is paid.
+- Automating the input.png image generation;
+- Encapsulating all of the scripts inside one big shell script to improve UX.
