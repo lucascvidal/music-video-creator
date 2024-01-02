@@ -1,5 +1,65 @@
 require 'rmagick'
 require 'dotenv/load'
+require 'net/http'
+require 'json'
+
+def generate_dalle_image(prompt)
+  api_key = ENV['OPENAI_API_KEY']
+  endpoint = ENV['OPENAI_IMAGES_ENDPOINT']
+  uri = URI(endpoint)
+
+  headers = {
+    'Content-Type' => 'application/json',
+    'Authorization' => "Bearer #{api_key}"
+  }
+
+  request_body = {
+    prompt: prompt,
+    model: 'dall-e-3',
+    size: '1792x1024',
+    quality: 'standard',
+    n: 1
+  }
+
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+
+  response = http.post(uri.path, request_body.to_json, headers)
+  image_url = JSON.parse(response.body)['data'][0]['url']
+
+  generated_image_path = 'tmp/image/generated_image.png'
+  File.open(generated_image_path, 'wb') do |file|
+    file.write Net::HTTP.get(URI(image_url))
+  end
+
+  generated_image_path
+end
+
+def generate_prompt(video_theme)
+  chatgpt_endpoint = ENV['OPENAI_CHAT_COMPLETION_URL']
+  uri = URI(chatgpt_endpoint)
+
+  headers = {
+    'Content-Type' => 'application/json',
+    'Authorization' => "Bearer #{ENV['OPENAI_API_KEY']}"
+  }
+
+  request_body = {
+    model: 'gpt-3.5-turbo',
+    messages: [
+      { role: 'system', content: 'You are a helpful assistant.' },
+      { role: 'user', content: "Create a prompt to be used with Dall-E for generating a thumbnail for a YouTube music video with the theme '#{video_theme}'." }
+    ]
+  }
+
+  http = Net::HTTP.new(uri.host, uri.port)
+  http.use_ssl = true
+
+  response = http.post(uri.path, request_body.to_json, headers)
+  response_json = JSON.parse(response.body)
+
+  response_json['choices'][0]['message']['content']
+end
 
 def add_centered_text(image_path, text_line1, text_line2, font_path1, font_size1, font_path2, font_size2, text_color)
   original_image = Magick::Image.read(image_path).first
@@ -25,7 +85,10 @@ def add_centered_text(image_path, text_line1, text_line2, font_path1, font_size1
   resized_image.write('tmp/thumbnail.png')
 end
 
-image_path = 'tmp/image/input.png'
+video_theme = ENV['VIDEO_THEME'].downcase
+prompt = generate_prompt(video_theme)
+generated_image_path = generate_dalle_image(prompt)
+
 text_line1 = ENV["THUMBNAIL_FIRST_LINE"].upcase
 text_line2 = ENV["THUMBNAIL_SECOND_LINE"].upcase
 font_path1 = 'tmp/fonts/oswald.ttf'
@@ -34,4 +97,4 @@ font_path2 = 'tmp/fonts/lato.ttf'
 font_size2 = 24
 text_color = 'white'
 
-add_centered_text(image_path, text_line1, text_line2, font_path1, font_size1, font_path2, font_size2, text_color)
+add_centered_text(generated_image_path, text_line1, text_line2, font_path1, font_size1, font_path2, font_size2, text_color)
