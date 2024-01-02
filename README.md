@@ -44,25 +44,24 @@ The last thing you need to set up is Google API credentials. Create a project on
 
 ## Usage
 
-1. Prepare the .env file with the template ID, BPM, and auth token for Soundful;
-1. Generate tracks:
+- Prepare the .env file with the template ID, BPM, and auth token for Soundful;
+- Generate tracks:
 ```shell
 ruby create_tracks.rb -v
 ```
-1. Download tracks:
+- Download tracks:
 ```shell
 ruby download_tracks.rb
 ```
-1. Generate a 1920 px x 1080 px image for the thumbnail, place it inside the tmp/image dir named as input.png (I'm using SeaArt as the source for that, but I haven't found a way to automate this task yet);
-1. Create video:
-```shell
-./create_video.sh
-```
-1. Generate thumbnail by setting the THUMBNAIL_FIRST_LINE and THUMBNAIL_SECOND_LINE environment vars inside .env and running:
+- Generate thumbnail by setting the VIDEO_THEME, THUMBNAIL_FIRST_LINE and THUMBNAIL_SECOND_LINE environment vars inside .env and running:
 ```shell
 ruby create_thumbnail.rb
 ```
-1. Upload the video to YouTube:
+- Create video:
+```shell
+./create_video.sh
+```
+- Upload the video to YouTube:
 ```shell
 python upload_video.py
 ```
@@ -74,9 +73,8 @@ python upload_video.py
 - Using the YouTube Data API V3;
 - Breaking the Soundful SPA API;
 - Using FFMPEG for the first time;
-- Integrating with Chat-GPT API.
+- Integrating with Chat-GPT and DALL-E API.
 
 # Things worth investigating
 
-- Automating the input.png image generation;
 - Encapsulating all of the scripts inside one big shell script to improve UX.
