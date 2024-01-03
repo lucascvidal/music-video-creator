@@ -14,7 +14,7 @@
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-    "postCreateCommand": "sudo apt update && sudo apt install -y ffmpeg imagemagick libmagickwand-dev libmagickcore-dev"
+    // "postCreateCommand": "bash -c 'source /workspaces/soundful-bot/.env'"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
