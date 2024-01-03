@@ -1,80 +1,60 @@
 # Soundful Bot
 
-This project started as just a script to automate track creation in Soundful. It then evolved to automating track concatenation and video creation. Now it generates title, description and tags for uploading it to YouTube. It ended up also uploading the video to YouTube.
+This project has evolved from a simple script for automating track creation in Soundful to a comprehensive bot that handles the entire process — from track creation and concatenation to video generation, including title, description, and tags. Additionally, it uploads the final video to YouTube.
 
 ## Prerequisites
 
-You need Ruby and Python. I'm using Ruby 3.2.2 and Python 3.9.2 as I'm developing this project. Furthermore, you need a few packages:
+Ensure you have Ruby and Python installed, specifically Ruby 3.2.2 and Python 3.9.2 in the current project development. Install the required packages:
 ```shell
 sudo apt update && sudo apt install -y ffmpeg imagemagick libmagickwand-dev libmagickcore-dev
 ```
 
-So, install gems:
+Install Ruby gems:
 ```shell
 bundle install
 ```
 
-Install python libs:
+Install Python libraries:
 ```shell
 pip install -r requirements.txt
 ```
 
-Create a tmp directory:
+Create necessary directories:
 ```shell
 mkdir tmp/
-```
-
-Create audio, image and fonts directories:
-```shell
 cd tmp/
 mkdir audio/
 mkdir image/
 mkdir fonts/
 ```
 
-Download Oswald Bold font and Lato Heavy font to fonts/ directory. You can find them at Google Fonts.
+Download Oswald Bold and Lato Heavy fonts from Google Fonts and place them in the fonts/ directory.
 
-Create a .env file with all the variables present at the .env.example file. You will need a Soundful subscription and OpenAI credits for this to work.
+Create a .env file with the required variables (refer to the .env.example file). You need Soundful subscription credentials and OpenAI API Key.
 
-For Soundful related variables, check the authorizationToken header using Dev Tools and get the User ID from the CDN URL when downloading a track from My Library. Soundful does not have a public API, so that's why we need to work around the restrictions.
-
-OpenAI is much simpler, just get an API Key from the OpenAI platform website.
-
-The last thing you need to set up is Google API credentials. Create a project on Google Cloud Platform, configure OAuth for desktop apps, set the scopes for youtube.upload and youtube.force-ssl, download the credentials.json file to the project's root directory and you should be good to go.
+Set up Google API credentials by creating a project on Google Cloud Platform, configuring OAuth for desktop apps, and downloading the credentials.json file to the project's root directory.
 
 ## Usage
 
-- Prepare the .env file with the template ID, BPM, and auth token for Soundful;
-- Generate tracks:
+- Prepare the Environment:
+Ensure your .env file is configured with the necessary variables for Soundful, YouTube, and OpenAI.
+- Run the Main Script:
+Execute the main script to guide you through the entire process:
 ```shell
-ruby create_tracks.rb -v
+./soundful_bot.sh
 ```
-- Download tracks:
-```shell
-ruby download_tracks.rb
-```
-- Generate thumbnail by setting the VIDEO_THEME, THUMBNAIL_FIRST_LINE and THUMBNAIL_SECOND_LINE environment vars inside .env and running:
-```shell
-ruby create_thumbnail.rb
-```
-- Create video:
-```shell
-./create_video.sh
-```
-- Upload the video to YouTube:
-```shell
-python upload_video.py
-```
+- Follow Prompts:
+The script will guide you step-by-step, providing prompts for user-specific details like user ID, video theme, thumbnail text, and OpenAI API key.
+- Pause Between Tasks:
+Keep in mind that there will be a pause of approximately 5 minutes between the creation and download of audio tracks, allowing sufficient time for the Soundful platform.
+- Completion:
+Upon completion, your video will be uploaded to YouTube, and the entire process will be seamlessly managed by the script.
 
 # What I learned
 
-- Working with ImageMagick;
-- Working with the Desktop App OAuth flow;
-- Using the YouTube Data API V3;
-- Breaking the Soundful SPA API;
-- Using FFMPEG for the first time;
+- Working with ImageMagick.
+- Managing the Desktop App OAuth flow.
+- Utilizing the YouTube Data API V3.
+- Overcoming challenges in working with the restricted Soundful SPA API.
+- First-time experience with FFMPEG.
 - Integrating with Chat-GPT and DALL-E API.
-
-# Things worth investigating
-
-- Encapsulating all of the scripts inside one big shell script to improve UX.
