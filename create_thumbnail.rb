@@ -1,9 +1,9 @@
 require 'rmagick'
-require 'dotenv/load'
 require 'net/http'
 require 'json'
+require 'optparse'
 
-def generate_dalle_image(prompt)
+def generate_dalle_image(prompt, verbose)
   api_key = ENV['OPENAI_API_KEY']
   endpoint = ENV['OPENAI_IMAGES_ENDPOINT']
   uri = URI(endpoint)
@@ -32,10 +32,11 @@ def generate_dalle_image(prompt)
     file.write Net::HTTP.get(URI(image_url))
   end
 
+  puts("Generated DALL-E image at #{generated_image_path}") if verbose
   generated_image_path
 end
 
-def generate_prompt(video_theme)
+def generate_prompt(video_theme, verbose)
   chatgpt_endpoint = ENV['OPENAI_CHAT_COMPLETION_URL']
   uri = URI(chatgpt_endpoint)
 
@@ -58,10 +59,12 @@ def generate_prompt(video_theme)
   response = http.post(uri.path, request_body.to_json, headers)
   response_json = JSON.parse(response.body)
 
-  response_json['choices'][0]['message']['content']
+  prompt = response_json['choices'][0]['message']['content']
+  puts("Generated prompt: #{prompt}") if verbose
+  prompt
 end
 
-def add_centered_text(image_path, text_line1, text_line2, font_path1, font_size1, font_path2, font_size2, text_color)
+def add_centered_text(image_path, text_line1, text_line2, font_path1, font_size1, font_path2, font_size2, text_color, verbose)
   original_image = Magick::Image.read(image_path).first
   resized_image = original_image.resize_to_fill(1280, 720)
   draw = Magick::Draw.new
@@ -81,13 +84,21 @@ def add_centered_text(image_path, text_line1, text_line2, font_path1, font_size1
     draw.fill = text_color
     draw.gravity = Magick::CenterGravity
   end
-
+  
   resized_image.write('tmp/thumbnail.png')
+  puts("Added centered text to the image") if verbose
 end
 
+options = { verbose: false }
+OptionParser.new do |opts|
+  opts.on("-v", "--verbose", "Show extra information") do
+    options[:verbose] = true
+  end
+end.parse!
+
 video_theme = ENV['VIDEO_THEME'].downcase
-prompt = generate_prompt(video_theme)
-generated_image_path = generate_dalle_image(prompt)
+prompt = generate_prompt(video_theme, options[:verbose])
+generated_image_path = generate_dalle_image(prompt, options[:verbose])
 
 text_line1 = ENV["THUMBNAIL_FIRST_LINE"].upcase
 text_line2 = ENV["THUMBNAIL_SECOND_LINE"].upcase
@@ -97,4 +108,5 @@ font_path2 = 'tmp/fonts/lato.ttf'
 font_size2 = 24
 text_color = 'white'
 
-add_centered_text(generated_image_path, text_line1, text_line2, font_path1, font_size1, font_path2, font_size2, text_color)
+add_centered_text(generated_image_path, text_line1, text_line2, font_path1, font_size1, font_path2, font_size2, text_color, options[:verbose])
+puts("Thumbnail created successfully!") if options[:verbose]
