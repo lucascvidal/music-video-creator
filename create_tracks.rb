@@ -1,5 +1,4 @@
 require 'optparse'
-require 'dotenv/load'
 require 'uri'
 require 'net/http'
 require 'json'
@@ -10,7 +9,7 @@ def preview_track(key)
   https = Net::HTTP.new(preview_track_url.host, preview_track_url.port)
   https.use_ssl = true
   request = Net::HTTP::Post.new(preview_track_url)
-  request["authorizationToken"] = ENV['AUTH_TOKEN']
+  request["Authorizationtoken"] = ENV['AUTH_TOKEN']
   request["Content-Type"] = "application/json"
   request.body = JSON.generate({ :templateId => ENV['TEMPLATE_ID'], :bpm => ENV['BPM'], :key => key })
   response = https.request(request)
@@ -27,7 +26,7 @@ def create_track(preview_id, bpm, key, template_id, duration, is_premium, templa
   https = Net::HTTP.new(create_track_url.host, create_track_url.port)
   https.use_ssl = true
   request = Net::HTTP::Patch.new(create_track_url)
-  request["authorizationToken"] = ENV['AUTH_TOKEN']
+  request["Authorizationtoken"] = ENV['AUTH_TOKEN']
   request["Content-Type"] = "application/json"
   request.body = JSON.generate({
     bpm: bpm,
@@ -54,7 +53,7 @@ def render_track(track_id)
   https = Net::HTTP.new(render_track_url.host, render_track_url.port)
   https.use_ssl = true
   request = Net::HTTP::Post.new(render_track_url)
-  request["authorizationToken"] = ENV['AUTH_TOKEN']
+  request["Authorizationtoken"] = ENV['AUTH_TOKEN']
   request["Content-Type"] = "application/json"
   request.body = JSON.generate({ type: "STANDARD" })
   response = https.request(request)
