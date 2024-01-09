@@ -65,7 +65,7 @@ if __name__ == "__main__":
                 "categoryId": "24"
             },
             "status": {
-                "privacyStatus": "public"
+                "privacyStatus": "private"
             }
         },
         media_body=googleapiclient.http.MediaFileUpload(video_filepath, chunksize=-1, resumable=True)
