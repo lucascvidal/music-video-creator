@@ -1,4 +1,4 @@
-# Soundful Bot
+# YT Video Creator
 
 This project has evolved from a simple script for automating track creation in Soundful to a comprehensive bot that handles the entire process — from track creation and concatenation to video generation, including title, description, and tags. Additionally, it uploads the final video to YouTube.
 
