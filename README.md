@@ -1,6 +1,8 @@
-# YT Video Creator
+# Music Video Creator
 
-This project has evolved from a simple script for automating track creation in Soundful to a comprehensive bot that handles the entire process — from track creation and concatenation to video generation, including title, description, and tags. Additionally, it uploads the final video to YouTube.
+This repository is archived because I no longer find it useful. Let me provide some context. I initially created a YouTube Dark Channel with the goal of monetizing the audience through Google AdSense. However, I grew weary of manually producing videos, prompting me, as a developer, to contemplate automating the video creation process. What began as a simple script for automating track creation in Soundful evolved into a comprehensive bot. This bot manages the entire process, from track creation and concatenation to video generation, including title, description, and tags. Additionally, it handles the upload of the final video to YouTube.
+
+Unfortunately, YouTube began flagging my videos as Spam and Computer Generated Content. Consequently, the most recent videos created and uploaded using the scripts in this repository are set to Private, restricting access to only myself. This results in no audience and, consequently, no AdSense opportunity. Therefore, I no longer see any practical use for this repository, aside from showcasing it in my portfolio due to its interesting scripts and integrations. If you're interested in using these scripts, please be aware that over time they may break, and I likely won't be updating them with fixes.
 
 ## Prerequisites
 
